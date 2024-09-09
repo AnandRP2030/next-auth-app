@@ -1,15 +1,26 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { axios } from "axios";
+import axios from "axios";
 
 const Signup = () => {
+  const router = useRouter();
   const [userDetails, setUserDetails] = useState({
     username: "",
     email: "",
     password: "",
   });
+  const [isBtnDisabled, setIsBtnDisabled] = useState(true);
+  useEffect(() => {
+    const { username, email, password } = userDetails;
+    if (username.length > 0 && email.length > 0 && password.length > 0) {
+      setIsBtnDisabled(false);
+    } else {
+      setIsBtnDisabled(true);
+    }
+  }, [userDetails]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserDetails({
@@ -17,14 +28,24 @@ const Signup = () => {
       [name]: value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("userDetails", userDetails);
+    try {
+        const res = await axios.post("/api/users/signup", userDetails);
 
-  }
+        console.log('res', res)
+    } catch (error) {
+        console.log("Error on signup", error);
+    }
+  };
   return (
     <div>
       <h1 className="text-center mt-5 text-2xl">Signup</h1>
-      <form onSubmit={handleSubmit} className="mt-6 max-w-96 min-h-96 m-auto flex flex-col bg-slate-800 p-3 leading-loose rounded">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-6 max-w-96 min-h-96 m-auto flex flex-col bg-slate-800 p-3 leading-loose rounded"
+      >
         <label htmlFor="username">Username</label>
         <input
           className="text-black"
@@ -53,6 +74,7 @@ const Signup = () => {
         />
 
         <button
+          disabled={isBtnDisabled}
           className="bg-slate-600 mt-6 w-6/12 mx-auto text-white text-center"
           type="submit"
         >
