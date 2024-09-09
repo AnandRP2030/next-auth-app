@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import {toast} from 'react-hot-toast';
 
 const Signup = () => {
   const router = useRouter();
@@ -29,11 +30,15 @@ const Signup = () => {
     });
   };
   const handleSubmit = async (e) => {
-    e.preventDefault();
+      e.preventDefault();
+    
     console.log("userDetails", userDetails);
     try {
         const res = await axios.post("/api/users/signup", userDetails);
-
+        if (res.status === 200) {
+            toast.success("Registration successfull")
+            router.push("/login");
+        }
         console.log('res', res)
     } catch (error) {
         console.log("Error on signup", error);

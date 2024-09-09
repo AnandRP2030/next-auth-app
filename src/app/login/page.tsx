@@ -2,13 +2,15 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { axios } from "axios";
+import axios  from "axios";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
   const [userDetails, setUserDetails] = useState({
     email: "",
     password: "",
   });
+  const router = useRouter();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserDetails({
@@ -16,8 +18,23 @@ const Login = () => {
       [name]: value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("user dat", userDetails);
+    try {
+      const res = await axios.post("/api/users/login", userDetails);
+      console.log('log res', res)
+      const status = res.data.status || 500;
+      if (status === 200) {
+        toast.success("Login successfull");
+        router.push("/profile")
+      } else {
+        const msg = res.data.message || "Something went wrong";
+        toast.error(msg);
+      }
+    } catch (error) {
+      console.log("Error on login", error);
+    }
   };
   return (
     <div>
